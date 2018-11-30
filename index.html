@@ -208,6 +208,15 @@ font-size: 16px;
               });
         }
       </script>
+
+
+<script src="/maps.google.polygon.containsLatLng.js"></script>
+
+<script>
+var coordinate = new google.maps.LatLng(40, -90);                                                                                                                                                                                                       
+var polygon = new google.maps.Polygon([], "#000000", 1, 1, "#336699", 0.3);
+var isWithinPolygon = polygon.containsLatLng(coordinate);
+</script>
      
   </body>
 </html>
