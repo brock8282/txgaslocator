@@ -68,7 +68,7 @@ font-size: 16px;
           </div>
 
 
-
+          <!-- <script src="maps.google.polygon.containsLatLng.js"></script> -->
           <script async defer
           src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdeqDzFtmXXhPJdVp6BtJgpZiIK4I4ozU&libraries=places&callback=initMap">
           </script>
@@ -117,6 +117,12 @@ font-size: 16px;
             var testimonial = document.getElementById('capture');
             testimonial.innerHTML = content;
           });
+
+
+
+
+
+
         // }
     
   
@@ -155,6 +161,17 @@ font-size: 16px;
             infowindow.close();
             marker.setVisible(false);
             var place = autocomplete.getPlace();
+            var lat = place.geometry.location.lat(),
+    lng = place.geometry.location.lng();
+
+    console.log(lat);
+console.log(lng);
+
+
+
+// var polygon = new google.maps.Polygon([], "#000000", 1, 1, "#336699", 0.3);
+// var isWithinPolygon = polygon.containsLatLng(lat,lng);
+
             if (!place.geometry) {
               // User entered the name of a Place that was not suggested and
               // pressed the Enter key, or the Place Details request failed.
@@ -171,6 +188,8 @@ font-size: 16px;
             }
             marker.setPosition(place.geometry.location);
             marker.setVisible(true);
+
+
   
             var address = '';
             if (place.address_components) {
@@ -206,17 +225,16 @@ font-size: 16px;
                 console.log('Checkbox clicked! New state=' + this.checked);
                 autocomplete.setOptions({strictBounds: this.checked});
               });
+
+
+
+
         }
       </script>
 
 
-<script src="/maps.google.polygon.containsLatLng.js"></script>
 
-<script>
-var coordinate = new google.maps.LatLng(40, -90);                                                                                                                                                                                                       
-var polygon = new google.maps.Polygon([], "#000000", 1, 1, "#336699", 0.3);
-var isWithinPolygon = polygon.containsLatLng(coordinate);
-</script>
+
      
   </body>
 </html>
