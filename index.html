@@ -14,6 +14,7 @@
       height: 100%;
       margin: 0;
       padding: 0;
+      font-family: Verdana, Geneva, Tahoma, sans-serif
       }
 
       input {
@@ -23,6 +24,11 @@
       }
     </style>
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdeqDzFtmXXhPJdVp6BtJgpZiIK4I4ozU&libraries=places&callback=initMap"></script>
+   
+
+   
   </head>
   <body>
 
@@ -33,12 +39,34 @@
       </div>
       </div>
       <div id="infowindow-content">
-        <img src="" width="16" height="16" id="place-icon">
+
         <span id="place-name"  class="title"></span><br><span id="place-address"></span>
       </div>
 
-      <script src="maps.google.polygon.containsLatLng.js"></script> 
-      <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdeqDzFtmXXhPJdVp6BtJgpZiIK4I4ozU&libraries=places&callback=initMap"></script>
+<div style="padding:40px 30px; display:grid;grid-template-columns: 1fr 1fr; grid-gap:20px;">
+
+  
+<div>
+  <h2>What I'm trying to do</h2>
+
+  <p>The idea is that when an address is selected and is in the polygon then I want to create a link to a page or redirect to a page, otherwise if it is out of the polygon then display a message. </p>
+
+</div>
+
+  <div>
+  
+  <h2>Use this for demo purposes </h2>
+
+  <p>OUT OF POLYGON - 2345 Washington Boulevard, Baltimore, MD, USA</p>
+  <p>IN POLYGON - 23346 Frederick Road, Clarksburg, MD, USA</p>
+  
+
+</div>
+
+
+
+</div>
+
       <script>
         
           var map;      
@@ -94,11 +122,7 @@
               marker.setVisible(false);
 
           var place = autocomplete.getPlace();
-          var lat = place.geometry.location.lat(),
-              lng = place.geometry.location.lng();
-
-              console.log(lat);
-              console.log(lng);
+        
 
           if (!place.geometry) {  
               window.alert("No details available for input: '" + place.name + "'");
@@ -126,33 +150,125 @@
               ].join(' ');
           }
 
-              infowindowContent.children['place-icon'].src = place.icon;
+   
               infowindowContent.children['place-name'].textContent = place.name;
               infowindowContent.children['place-address'].textContent = address;
               infowindow.open(map, marker);
 
-          var polygon = new google.maps.Polygon([], "#000000", 1, 1, "#336699", 0.3);
+
+  var lat = place.geometry.location.lat(),
+              lng = place.geometry.location.lng();
+
+              console.log(lat);
+              console.log(lng);
+
+
+
+
+        if (!google.maps.Polygon.prototype.getBounds) {
+  google.maps.Polygon.prototype.getBounds = function(latLng) {
+    var bounds = new google.maps.LatLngBounds(),
+      paths = this.getPaths(),
+      path,
+      p, i;
+
+    for (p = 0; p < paths.getLength(); p++) {
+      path = paths.getAt(p);
+      for (i = 0; i < path.getLength(); i++) {
+        bounds.extend(path.getAt(i));
+      }
+    }
+
+    return bounds;
+  };
+}
+      
+      
+      // Polygon containsLatLng - method to determine if a latLng is within a polygon
+google.maps.Polygon.prototype.containsLatLng = function(latLng) {
+  // Exclude points outside of bounds as there is no way they are in the poly
+
+  var inPoly = false,
+    bounds, lat, lng,
+    numPaths, p, path, numPoints,
+    i, j, vertex1, vertex2;
+
+  // Arguments are a pair of lat, lng variables
+  if (arguments.length == 2) {
+    if (
+      typeof arguments[0] == "number" &&
+      typeof arguments[1] == "number"
+    ) {
+      lat = arguments[0];
+      lng = arguments[1];
+    }
+  } else if (arguments.length == 1) {
+    bounds = this.getBounds();
+
+    if (!bounds && !bounds.contains(latLng)) {
+      return false;
+    }
+    lat = latLng.lat();
+    lng = latLng.lng();
+  } else {
+    console.log("Wrong number of inputs in google.maps.Polygon.prototype.contains.LatLng");
+  }
+
+  // Raycast point in polygon method
+
+  numPaths = this.getPaths().getLength();
+  for (p = 0; p < numPaths; p++) {
+    path = this.getPaths().getAt(p);
+    numPoints = path.getLength();
+    j = numPoints - 1;
+
+    for (i = 0; i < numPoints; i++) {
+      vertex1 = path.getAt(i);
+      vertex2 = path.getAt(j);
+
+      if (
+        vertex1.lng() <  lng &&
+        vertex2.lng() >= lng ||
+        vertex2.lng() <  lng &&
+        vertex1.lng() >= lng
+      ) {
+        if (
+          vertex1.lat() +
+          (lng - vertex1.lng()) /
+          (vertex2.lng() - vertex1.lng()) *
+          (vertex2.lat() - vertex1.lat()) <
+          lat
+        ) {
+          inPoly = !inPoly;
+        }
+      }
+
+      j = i;
+    }
+  }
+
+  return inPoly;
+};
+
+
+ var polygon = new google.maps.Polygon([], "#000000", 1, 1, "#336699", 0.3);
           var isWithinPolygon = polygon.containsLatLng(lat,lng);
+
+
+         
         });
 
-        function setupClickListener(id, types) {
-          var radioButton = document.getElementById(id);
-          radioButton.addEventListener('click', function() {
-            autocomplete.setTypes(types);
-          });
-        }
+     
+        
 
-        setupClickListener('changetype-all', []);
-        setupClickListener('changetype-address', ['address']);
-        setupClickListener('changetype-establishment', ['establishment']);
-        setupClickListener('changetype-geocode', ['geocode']);
 
-        document.getElementById('use-strict-bounds')
-        .addEventListener('click', function() {
-        console.log('Checkbox clicked! New state=' + this.checked);
-        autocomplete.setOptions({strictBounds: this.checked});
-        });
-        }
+
+
+
+
+
+      
+      }
   </script>    
   </body>
 </html>
