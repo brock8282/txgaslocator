@@ -45,46 +45,16 @@ function initialize() {
 }
 
 function initMap() {
-  var map = new google.maps.Map(document.getElementById('map'), {
+
+////////////////////////////MAP////////////////////////////////////
+
+var map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 24.886, lng: -70.269},
-    zoom: 5,
+    zoom: 7,
   });
 
-  var triangleCoords = [
-    {lat: 25.774, lng: -80.19},
-    {lat: 18.466, lng: -66.118},
-    {lat: 32.321, lng: -64.757}
-  ];
+////////////////////////////INPUT///////////////////////////////////
 
-  var bermudaTriangle = new google.maps.Polygon({paths: triangleCoords});
-
-  google.maps.event.addListener(map, 'click', function(e) {
-    var resultColor =
-        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
-        'blue' :
-        'red';
-
-    var resultPath =
-        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
-        // A triangle.
-        "m 0 -1 l 1 2 -2 0 z" :
-        google.maps.SymbolPath.CIRCLE;
-
-    new google.maps.Marker({
-      position: e.latLng,
-      map: map,
-      icon: {
-        path: resultPath,
-        fillColor: resultColor,
-        fillOpacity: .2,
-        strokeColor: 'white',
-        strokeWeight: .5,
-        scale: 10
-      }
-    });
-  });
-
-  
 
 
 
@@ -149,6 +119,70 @@ function initMap() {
     });
     map.fitBounds(bounds);
   });
+
+//  var input = document.getElementById('pac-input');
+//         var autocomplete = new google.maps.places.Autocomplete(input);
+//         google.maps.event.addListener(autocomplete, 'place_changed', function () {
+//             var place = autocomplete.getPlace();
+            
+
+
+//  var lat = place.geometry.location.lat(),
+//                 lng = place.geometry.location.lng();
+//             var coordinates = lat + '","'+ lng;
+
+//               console.log(coordinates);
+
+////////////////////////////POLYS///////////////////////////////////
+
+
+  
+
+  var triangleCoords = [
+    {lat: 25.774, lng: -80.19},
+    {lat: 18.466, lng: -66.118},
+    {lat: 32.321, lng: -64.757}
+  ];
+
+  var bermudaTriangle = new google.maps.Polygon({paths: triangleCoords});
+
+  google.maps.event.addListener(map, 'click', function(e) {
+    var resultColor =
+        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
+        'blue' :
+        'red';
+
+    var resultPath =
+        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
+        // A triangle.
+        "m 0 -1 l 1 2 -2 0 z" :
+        google.maps.SymbolPath.CIRCLE;
+
+    new google.maps.Marker({
+      position: e.latLng,
+      map: map,
+      icon: {
+        path: resultPath,
+        fillColor: resultColor,
+        fillOpacity: .2,
+        strokeColor: 'white',
+        strokeWeight: .5,
+        scale: 10
+      }
+    });
+
+
+
+
+
+
+
+  });
+
+  
+
+
+
 }
 </script>
 
