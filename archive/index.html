@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>KML Click Capture Sample</title>
+
+    <style>
+      #map {
+      height: 500px;
+      }
+
+      html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Verdana, Geneva, Tahoma, sans-serif
+      }
+
+      input {
+      width: 100%;
+      padding: 10px 10px;
+      font-size: 16px;
+      }
+    </style>
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdeqDzFtmXXhPJdVp6BtJgpZiIK4I4ozU&libraries=places&callback=initMap"></script>
+   
+
+   
+  </head>
+  <body>
+
+      <div id="map"></div>
+      <div class="pac-card" id="pac-card">
+      <div id="pac-container">
+        <input id="pac-input" type="text" placeholder="Enter a location">
+      </div>
+      </div>
+      <div id="infowindow-content">
+
+        <span id="place-name"  class="title"></span><br><span id="place-address"></span>
+      </div>
+
+<div style="padding:40px 30px; display:grid;grid-template-columns: 1fr 1fr; grid-gap:20px;">
+
+  
+<div>
+  <h2>What I'm trying to do</h2>
+
+  <p>The idea is that when an address is selected and is in the polygon then I want to create a link to a page or redirect to a page, otherwise if it is out of the polygon then display a message. </p>
+
+</div>
+
+  <div>
+  
+  <h2>Use this for demo purposes </h2>
+
+  <p>OUT OF POLYGON - 2345 Washington Boulevard, Baltimore, MD, USA</p>
+  <p>IN POLYGON - 23346 Frederick Road, Clarksburg, MD, USA</p>
+  
+
+</div>
+
+
+
+</div>
+
+      <script>
+        
+          var map;      
+          var src= 'https://cdn2.hubspot.net/hubfs/4826017/mapdata/Montgomery%20County%20Boundary.kml';
+
+          //  var layer2src= 'https://maps-data.nrel.gov/geoserver/nrel/wms?service=WMS&version=1.1.0&request=GetMap&layers=nrel:naturalgas_processingplants_us_2014_v2&styles=&bbox=-121.968086242676,26.3361492156982,-78.512939453125,48.9488830566406&width=768&height=399&srs=EPSG:4326&format=application%2Fvnd.google-earth.kmz%20xml';
+
+          function initMap() {
+              map = new google.maps.Map(document.getElementById('map'), {
+              center: new google.maps.LatLng(30.2224036, -95.6209387),
+              zoom: 12,
+              mapTypeId: 'roadmap'
+          });
+
+          var kmlLayer = new google.maps.KmlLayer(src, {
+              suppressInfoWindows: false,
+              preserveViewport: false,
+              map: map
+          });
+
+          //    var kmlLayer2 = new google.maps.KmlLayer(layer2src, {
+          //     suppressInfoWindows: false,
+          //     preserveViewport: false,
+          //     map: map
+          //   });
+
+          kmlLayer.addListener('click', function(event) {
+            var content = event.featureData.infoWindowHtml;
+            var testimonial = document.getElementById('capture');
+                testimonial.innerHTML = content;
+          });
+
+          var card = document.getElementById('pac-card');
+          var input = document.getElementById('pac-input');
+          var types = document.getElementById('type-selector');
+          var strictBounds = document.getElementById('strict-bounds-selector');
+
+          var autocomplete = new google.maps.places.Autocomplete(input);
+              autocomplete.bindTo('bounds', map);
+              autocomplete.setFields(
+              ['address_components', 'geometry', 'icon', 'name']);
+
+          var infowindow = new google.maps.InfoWindow();
+          var infowindowContent = document.getElementById('infowindow-content');
+              infowindow.setContent(infowindowContent);
+          var marker = new google.maps.Marker({
+              map: map,
+              anchorPoint: new google.maps.Point(0, -29)
+            });
+
+              autocomplete.addListener('place_changed', function() {
+              infowindow.close();
+              marker.setVisible(false);
+
+          var place = autocomplete.getPlace();
+        
+
+          if (!place.geometry) {  
+              window.alert("No details available for input: '" + place.name + "'");
+                
+              return;
+          }
+
+          if (place.geometry.viewport) 
+          {
+            map.fitBounds(place.geometry.viewport);
+          }  else 
+          {
+            map.setCenter(place.geometry.location);
+            map.setZoom(17);  
+          }
+            marker.setPosition(place.geometry.location);
+            marker.setVisible(true);
+
+          var address = '';
+          if (place.address_components) {
+              address = [
+                (place.address_components[0] && place.address_components[0].short_name || ''),
+                (place.address_components[1] && place.address_components[1].short_name || ''),
+                (place.address_components[2] && place.address_components[2].short_name || '')
+              ].join(' ');
+          }
+
+   
+              infowindowContent.children['place-name'].textContent = place.name;
+              infowindowContent.children['place-address'].textContent = address;
+              infowindow.open(map, marker);
+
+
+  var lat = place.geometry.location.lat(),
+              lng = place.geometry.location.lng();
+
+              console.log(lat);
+              console.log(lng);
+
+
+
+
+        if (!google.maps.Polygon.prototype.getBounds) {
+  google.maps.Polygon.prototype.getBounds = function(latLng) {
+    var bounds = new google.maps.LatLngBounds(),
+      paths = this.getPaths(),
+      path,
+      p, i;
+
+    for (p = 0; p < paths.getLength(); p++) {
+      path = paths.getAt(p);
+      for (i = 0; i < path.getLength(); i++) {
+        bounds.extend(path.getAt(i));
+      }
+    }
+
+    return bounds;
+  };
+}
+      
+      
+      // Polygon containsLatLng - method to determine if a latLng is within a polygon
+google.maps.Polygon.prototype.containsLatLng = function(latLng) {
+  // Exclude points outside of bounds as there is no way they are in the poly
+
+  var inPoly = false,
+    bounds, lat, lng,
+    numPaths, p, path, numPoints,
+    i, j, vertex1, vertex2;
+
+  // Arguments are a pair of lat, lng variables
+  if (arguments.length == 2) {
+    if (
+      typeof arguments[0] == "number" &&
+      typeof arguments[1] == "number"
+    ) {
+      lat = arguments[0];
+      lng = arguments[1];
+    }
+  } else if (arguments.length == 1) {
+    bounds = this.getBounds();
+
+    if (!bounds && !bounds.contains(latLng)) {
+      return false;
+    }
+    lat = latLng.lat();
+    lng = latLng.lng();
+  } else {
+    console.log("Wrong number of inputs in google.maps.Polygon.prototype.contains.LatLng");
+  }
+
+  // Raycast point in polygon method
+
+  numPaths = this.getPaths().getLength();
+  for (p = 0; p < numPaths; p++) {
+    path = this.getPaths().getAt(p);
+    numPoints = path.getLength();
+    j = numPoints - 1;
+
+    for (i = 0; i < numPoints; i++) {
+      vertex1 = path.getAt(i);
+      vertex2 = path.getAt(j);
+
+      if (
+        vertex1.lng() <  lng &&
+        vertex2.lng() >= lng ||
+        vertex2.lng() <  lng &&
+        vertex1.lng() >= lng
+      ) {
+        if (
+          vertex1.lat() +
+          (lng - vertex1.lng()) /
+          (vertex2.lng() - vertex1.lng()) *
+          (vertex2.lat() - vertex1.lat()) <
+          lat
+        ) {
+          inPoly = !inPoly;
+        }
+      }
+
+      j = i;
+    }
+  }
+
+  return inPoly;
+};
+
+
+ var polygon = new google.maps.Polygon([], "#000000", 1, 1, "#336699", 0.3);
+          var isWithinPolygon = polygon.containsLatLng(lat,lng);
+
+
+         
+        });
+
+     
+        
+
+
+
+
+
+
+
+      
+      }
+  </script>    
+  </body>
+</html>
