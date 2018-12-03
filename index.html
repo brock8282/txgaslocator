@@ -55,11 +55,6 @@ var map = new google.maps.Map(document.getElementById('map'), {
 
 ////////////////////////////INPUT///////////////////////////////////
 
-
-
-
-  
-
   // Create the search box and link it to the UI element.
   var input = document.getElementById('pac-input');
   var searchBox = new google.maps.places.SearchBox(input);
@@ -76,7 +71,6 @@ var map = new google.maps.Map(document.getElementById('map'), {
   searchBox.addListener('places_changed', function() {
     var places = searchBox.getPlaces();
    
-
     if (places.length == 0) {
       return;
     }
@@ -89,6 +83,19 @@ var map = new google.maps.Map(document.getElementById('map'), {
 
     // For each place, get the icon, name and location.
     var bounds = new google.maps.LatLngBounds();
+    google.maps.event.addListener(map, 'click', function(e) {
+var resultColor =
+        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
+        'blue' :
+        'red';
+
+    var resultPath =
+        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
+        // A triangle.
+        "m 0 -1 l 1 2 -2 0 z" :
+        google.maps.SymbolPath.CIRCLE;
+});
+
     places.forEach(function(place) {
       if (!place.geometry) {
         console.log("Returned place contains no geometry");
@@ -103,12 +110,57 @@ var map = new google.maps.Map(document.getElementById('map'), {
       };
 
       // Create a marker for each place.
-      markers.push(new google.maps.Marker({
-        map: map,
-        icon: icon,
-        title: place.name,
-        position: place.geometry.location
-      }));
+
+    
+
+
+      markers.push(
+        
+      //   new google.maps.Marker({
+      //   map: map,
+      //   icon: icon,
+      //   title: place.name,
+      //   position: place.geometry.location
+      // })
+
+    new google.maps.Marker({
+      // position: e.latLng,
+      map: map,
+      position: place.geometry.location,
+      // icon: icon 
+      // // {
+      // //   path: resultPath,
+      // //   fillColor: resultColor,
+      // //   fillOpacity: .2,
+      // //   strokeColor: 'white',
+      // //   strokeWeight: .5,
+      // //   scale: 10
+      // // }
+
+
+      icon: 
+      {
+        // path: resultPath,
+        // fillColor: resultColor,
+
+        path:'m 0 -1 l 1 2 -2 0 z',
+        fillColor: 'red',
+        fillOpacity: .2,
+        strokeColor: 'white',
+        strokeWeight: .5,
+        scale: 10
+      }
+
+
+    })
+
+
+      );
+
+
+     
+
+
 
       if (place.geometry.viewport) {
         // Only geocodes have viewport.
@@ -125,8 +177,6 @@ var map = new google.maps.Map(document.getElementById('map'), {
 //         google.maps.event.addListener(autocomplete, 'place_changed', function () {
 //             var place = autocomplete.getPlace();
             
-
-
 //  var lat = place.geometry.location.lat(),
 //                 lng = place.geometry.location.lng();
 //             var coordinates = lat + '","'+ lng;
@@ -134,9 +184,6 @@ var map = new google.maps.Map(document.getElementById('map'), {
 //               console.log(coordinates);
 
 ////////////////////////////POLYS///////////////////////////////////
-
-
-  
 
   var triangleCoords = [
     {lat: 25.774, lng: -80.19},
@@ -146,48 +193,8 @@ var map = new google.maps.Map(document.getElementById('map'), {
 
   var bermudaTriangle = new google.maps.Polygon({paths: triangleCoords});
 
-  google.maps.event.addListener(map, 'click', function(e) {
-    var resultColor =
-        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
-        'blue' :
-        'red';
-
-    var resultPath =
-        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
-        // A triangle.
-        "m 0 -1 l 1 2 -2 0 z" :
-        google.maps.SymbolPath.CIRCLE;
-
-    new google.maps.Marker({
-      position: e.latLng,
-      map: map,
-      icon: {
-        path: resultPath,
-        fillColor: resultColor,
-        fillOpacity: .2,
-        strokeColor: 'white',
-        strokeWeight: .5,
-        scale: 10
-      }
-    });
-
-
-
-
-
-
-
-  });
-
-  
-
-
 
 }
 </script>
-
-
-
-
 </body>
 </html>
