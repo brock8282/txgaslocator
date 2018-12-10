@@ -49,13 +49,16 @@ function initMap() {
 ////////////////////////////MAP////////////////////////////////////
 
 var map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 30.2103896, lng: -95.7288787},
-    zoom: 12,
-  });  
-
-  
+    center: {lat: 24.886, lng: -70.269},
+    zoom: 7,
+  });
 
 ////////////////////////////INPUT///////////////////////////////////
+
+
+
+
+  
 
   // Create the search box and link it to the UI element.
   var input = document.getElementById('pac-input');
@@ -73,6 +76,7 @@ var map = new google.maps.Map(document.getElementById('map'), {
   searchBox.addListener('places_changed', function() {
     var places = searchBox.getPlaces();
    
+
     if (places.length == 0) {
       return;
     }
@@ -85,22 +89,7 @@ var map = new google.maps.Map(document.getElementById('map'), {
 
     // For each place, get the icon, name and location.
     var bounds = new google.maps.LatLngBounds();
-
-
     places.forEach(function(place) {
-
-    google.maps.event.addListener(map, 'place_changed', function(e) {
-
-var resultColor = google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
-    'blue' :
-    'red';
-
-var resultPath = google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
-    // "m 0 -1 l 1 2 -2 0 z"
-    google.maps.SymbolPath.CIRCLE:
-    google.maps.SymbolPath.CIRCLE;
-});
-
       if (!place.geometry) {
         console.log("Returned place contains no geometry");
         return;
@@ -110,24 +99,16 @@ var resultPath = google.maps.geometry.poly.containsLocation(e.latLng, bermudaTri
         size: new google.maps.Size(71, 71),
         origin: new google.maps.Point(0, 0),
         anchor: new google.maps.Point(17, 34),
-        scaledSize: new google.maps.Size(25, 25),
-        path: resultPath,
-        fillColor: resultColor
+        scaledSize: new google.maps.Size(25, 25)
       };
 
       // Create a marker for each place.
       markers.push(new google.maps.Marker({
-      // position: e.latLng,
-      map: map,
-      position: place.geometry.location,
-      icon:{
-        fillOpacity: .2,
-        strokeColor: 'white',
-        strokeWeight: .5,
-        scale: 10
-      }
-    }) 
-    );
+        map: map,
+        icon: icon,
+        title: place.name,
+        position: place.geometry.location
+      }));
 
       if (place.geometry.viewport) {
         // Only geocodes have viewport.
@@ -144,6 +125,8 @@ var resultPath = google.maps.geometry.poly.containsLocation(e.latLng, bermudaTri
 //         google.maps.event.addListener(autocomplete, 'place_changed', function () {
 //             var place = autocomplete.getPlace();
             
+
+
 //  var lat = place.geometry.location.lat(),
 //                 lng = place.geometry.location.lng();
 //             var coordinates = lat + '","'+ lng;
@@ -152,16 +135,59 @@ var resultPath = google.maps.geometry.poly.containsLocation(e.latLng, bermudaTri
 
 ////////////////////////////POLYS///////////////////////////////////
 
+
+  
+
   var triangleCoords = [
-    {lat: 30.2214836, lng: -95.6187957}, 
-    {lat: 30.1614816, lng: -95.7175187},
-    {lat: 30.1373866, lng: -95.5372417}
+    {lat: 25.774, lng: -80.19},
+    {lat: 18.466, lng: -66.118},
+    {lat: 32.321, lng: -64.757}
   ];
 
   var bermudaTriangle = new google.maps.Polygon({paths: triangleCoords});
 
+  google.maps.event.addListener(map, 'click', function(e) {
+    var resultColor =
+        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
+        'blue' :
+        'red';
+
+    var resultPath =
+        google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle) ?
+        // A triangle.
+        "m 0 -1 l 1 2 -2 0 z" :
+        google.maps.SymbolPath.CIRCLE;
+
+    new google.maps.Marker({
+      position: e.latLng,
+      map: map,
+      icon: {
+        path: resultPath,
+        fillColor: resultColor,
+        fillOpacity: .2,
+        strokeColor: 'white',
+        strokeWeight: .5,
+        scale: 10
+      }
+    });
+
+
+
+
+
+
+
+  });
+
+  
+
+
 
 }
 </script>
+
+
+
+
 </body>
 </html>
